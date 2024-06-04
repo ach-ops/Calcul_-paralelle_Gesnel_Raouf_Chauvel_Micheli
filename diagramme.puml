@@ -1,0 +1,24 @@
+@startuml
+participant Client
+participant ServeurCentral as "Serveur Central"
+participant NoeudCalcul as "Noeud de Calcul"
+
+note over Client, ServeurCentral : Le client demande un service de calcul au serveur central.
+
+Client -> ServeurCentral : demanderService()
+activate ServeurCentral
+ServeurCentral --> Client : RD
+deactivate ServeurCentral
+
+note over Client, NoeudCalcul : Le client envoie une scène et des coordonnées à un nœud de calcul.
+
+loop pour chaque Coordonnees
+    Client -> NoeudCalcul : calculer(scene, coordonnees)
+    activate NoeudCalcul
+
+    note over NoeudCalcul : Le nœud de calcul renvoie une image au client.
+
+    NoeudCalcul --> Client : Image
+    deactivate NoeudCalcul
+end
+@enduml
