@@ -22,7 +22,7 @@ public class Calcul implements CalculInterface
         Instant fin = Instant.now();
 
         long duree = Duration.between(debut, fin).toMillis();
-        System.out.println("Image calculé en " + duree);
+        System.out.println("Image calculé en " + duree + "ms");
         return image;
     }
 }

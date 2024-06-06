@@ -1,4 +1,6 @@
 import java.rmi.RemoteException;
+import java.rmi.server.RemoteServer;
+import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +31,13 @@ public class Distributeur implements ServiceDistributeur {
     public synchronized void addCalcule(CalculInterface serviceCalcule) throws RemoteException {
         synchronized (services) {
             services.add(serviceCalcule);
-            System.out.println(serviceCalcule);
-            System.out.println("Service ajouté");
+            String host = "";
+            try {
+                host = RemoteServer.getClientHost();
+            } catch (ServerNotActiveException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Service ajouté : " + host);
         }
     }
 
@@ -38,7 +45,14 @@ public class Distributeur implements ServiceDistributeur {
     public synchronized void deleteCalcule(CalculInterface serviceCalcule) throws RemoteException {
         synchronized (services) {
             services.remove(serviceCalcule);
-            System.out.println("Service supprimé");
+
+            String host = "";
+            try {
+                host = RemoteServer.getClientHost();
+            } catch (ServerNotActiveException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Service supprimé : " + host);
         }
     }
 

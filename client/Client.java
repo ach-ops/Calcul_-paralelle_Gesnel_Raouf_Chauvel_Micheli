@@ -3,9 +3,7 @@ import raytracer.Scene;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
 public class Client {
 
     // Méthode pour diviser l'image en plusieurs parties
@@ -29,11 +27,14 @@ public class Client {
 
     // Méthode pour calculer l'image
     public static void calculerImage(ServiceDistributeur distributeur, String scenePath, int nbpart, int width, int heigth) {
+        long startTime = System.currentTimeMillis();
         List<Coordonnees> list = Client.splitImage(nbpart, width, heigth);
         // Récupération de la scène
         Scene scene = new Scene(scenePath, width, heigth);
         // Création d'une fenêtre
         Disp disp = new Disp("Raytracer", width, heigth);
+        // Liste des threads
+        List<Thread> threads = new ArrayList<>();
         // Pour chaque coordonnées
         for (Coordonnees coor : list) {
             Thread t = new Thread() {
@@ -42,7 +43,7 @@ public class Client {
 
                     // Tant que le calcul n'est pas terminé
                     while (!calc) {
-                        // Récupération d'une instance de 'calcule'
+                        // Récupération d'une instance de 'calcul'
                         CalculInterface calcService = null;
                         try {
                             calcService = distributeur.demanderService();
@@ -56,8 +57,6 @@ public class Client {
                             // Calcul de l'image
                             try {
                                 raytracer.Image image = calcService.calculer(scene, coor);
-                                System.out.printf(coor.x + " " + coor.y);
-                                System.out.printf(image.toString() + "\n");
                                 disp.setImage(image, coor.x, coor.y);
                                 calc = true;
                             } catch (RemoteException r) {
@@ -88,7 +87,18 @@ public class Client {
                     }
                 }
             };
+            threads.add(t);
             t.start();
         }
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long duration = endTime - startTime;
+        System.out.println("Temps d'exécution : " + duration + " ms");
     }
 }

@@ -16,9 +16,9 @@ public class Start {
             Registry reg = LocateRegistry.createRegistry(Integer.parseInt(args[0]));
             // On bind le service à l'objet
             reg.rebind("distributeur", rd);
-            System.out.println("Service central démarré sur le port " + args[0] + " ..." + " avec le service " + rd + " ...");
+            System.out.println("Service central démarré sur le port " + args[0]);
         } catch (AccessException a) {
-            System.out.println("Erreur d'accès au regsitry : " + a.getMessage());
+            System.out.println("Erreur d'accès au registry : " + a.getMessage());
         } catch(RemoteException r){
             System.out.println("Erreur d'obtention du registry" + r.getMessage());
         }
