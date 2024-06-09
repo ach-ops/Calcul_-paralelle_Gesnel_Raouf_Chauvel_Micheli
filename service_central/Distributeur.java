@@ -28,15 +28,15 @@ public class Distributeur implements ServiceDistributeur {
     public synchronized void  addCalcule(CalculInterface serviceCalcule) throws RemoteException {
         synchronized (services){
             services.add(serviceCalcule);
-            System.out.println("Service ajouté");
-            System.out.println("Nombre de services présent : " + services.size());
+            System.out.println("Noeud ajouté");
             String host = "";
             try {
                 host = RemoteServer.getClientHost();
             } catch (ServerNotActiveException e) {
                 e.printStackTrace();
             }
-            System.out.println("Adresse IP du service : " + host);
+            System.out.println("Enregistrement du nouveau noeud: " + host);
+            System.out.println("Nombre de noeuds présents : " + services.size());
         }
     }
 
@@ -44,15 +44,15 @@ public class Distributeur implements ServiceDistributeur {
     public synchronized void deleteCalcule(CalculInterface serviceCalcule) throws RemoteException {
         synchronized (services){
             services.remove(serviceCalcule);
-            System.out.println("Service supprimé");
-            System.out.println("Nombre de services restants : " + services.size());
+            System.out.println("Noeud supprimé");
             String host = "";
             try {
                 host = RemoteServer.getClientHost();
             } catch (ServerNotActiveException e) {
                 e.printStackTrace();
             }
-            System.out.println("Adresse IP du service qui est parti : " + host);
+            System.out.println("Adresse IP du noeud qui est parti : " + host);
+            System.out.println("Nombre de noeuds restants : " + services.size());
         }
     }
 
