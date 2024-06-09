@@ -109,6 +109,7 @@ public class Client {
         // Création d'une fenêtre
         Disp disp = new Disp("Raytracer", width, height);
 
+        long startTime = System.currentTimeMillis();
         for (Coordonnees coor : list) {
             boolean calc = false;
 
@@ -156,6 +157,9 @@ public class Client {
                     }
                 }
             }
+            long endTime = System.currentTimeMillis();
+            long totalTime = endTime - startTime;
+            System.out.println("Temps total de calcul : " + totalTime + " ms");
         }
     }
 }
