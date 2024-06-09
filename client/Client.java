@@ -3,81 +3,91 @@ import raytracer.Scene;
 import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 public class Client {
 
-    // Méthode pour diviser l'image en plusieurs parties
-    public static List<Coordonnees> splitImage(int nbPart, int width, int heigth) {
+    // Méthode pour diviser une image en parties
+    public static List<Coordonnees> splitImage(int nbPart, int width, int height){
         int nbLongPart = (int) (Math.sqrt(nbPart));
-        int partwidth = width / nbLongPart;
-        int partHeigth = heigth / nbLongPart;
+        int partwidth = width/nbLongPart;
+        int partHeight = height/nbLongPart;
         int x;
         int y = 0;
-        List<Coordonnees> res = new ArrayList<>();
-        for (int i = 0; i < nbLongPart; i++) {
-            x = 0;
-            for (int j = 0; j < nbLongPart; j++) {
-                res.add(new Coordonnees(x, y, partwidth, partHeigth));
-                x += partwidth;
+        List<Coordonnees> res = new ArrayList<>(); // Initialisation d'une liste de Coordonnees
+
+        // Boucle pour parcourir les parties de l'image
+        for (int i=0; i<nbLongPart; i++){
+            x=0;
+            for (int j=0; j<nbLongPart; j++){
+                res.add(new Coordonnees(x,y,partwidth,partHeight)); // Ajout des coordonnées d'une partie à la liste
+                x+= partwidth;
             }
-            y += partHeigth;
+            y+= partHeight;
         }
-        return res;
+        return res; // Retourne la liste des coordonnées des parties de l'image
     }
 
-    // Méthode pour calculer l'image
-    public static void calculerImage(ServiceDistributeur distributeur, String scenePath, int nbpart, int width, int heigth) {
-        long startTime = System.currentTimeMillis();
-        List<Coordonnees> list = Client.splitImage(nbpart, width, heigth);
+    // Méthode pour calculer une image en utilisant un service de distribution
+    public static void calculerImage(ServiceDistributeur distributeur , String scenePath, int nbPart, int width, int height){
+
+        // Récupération de la liste des coordonnées des parties de l'image
+        List<Coordonnees> list = Client.splitImage(nbPart, width, height);
+
         // Récupération de la scène
-        Scene scene = new Scene(scenePath, width, heigth);
+        Scene scene = new Scene(scenePath, width, height);
+
         // Création d'une fenêtre
-        Disp disp = new Disp("Raytracer", width, heigth);
-        // Liste des threads
-        List<Thread> threads = new ArrayList<>();
-        // Pour chaque coordonnées
-        for (Coordonnees coor : list) {
+        Disp disp = new Disp("Raytracer", width, height);
+
+        for (Coordonnees coor : list){
+
+            // Création d'un nouveau thread
             Thread t = new Thread() {
                 public void run() {
                     boolean calc = false;
 
-                    // Tant que le calcul n'est pas terminé
-                    while (!calc) {
-                        // Récupération d'une instance de 'calcul'
+                    while (!calc){
+
                         CalculInterface calcService = null;
+
                         try {
                             calcService = distributeur.demanderService();
                         } catch (RemoteException e) {
-                            System.out.println("Serveur pas disponible, veuillez patienter...");
+                            System.out.println("Serveur non disponible");
                             e.printStackTrace();
                             break;
                         }
 
-                        if (calcService != null) {
+                        if (calcService != null){
+
                             // Calcul de l'image
                             try {
                                 raytracer.Image image = calcService.calculer(scene, coor);
+                                System.out.printf(coor.x +" " + coor.y);
+                                System.out.printf(image.toString() + "\n");
                                 disp.setImage(image, coor.x, coor.y);
                                 calc = true;
-                            } catch (RemoteException r) {
-                                System.out.println("Erreur lors du calcul, veuillez patienter...");
+                            }catch (RemoteException r){
+                                System.out.println("Échec du calcul");
                                 r.printStackTrace();
                                 try {
                                     distributeur.deleteCalcule(calcService);
                                 } catch (RemoteException e) {
                                     throw new RuntimeException(e);
                                 }
-                                System.out.println("Service effacé");
+                                System.out.println("Service supprimé");
                             } catch (ServerNotActiveException e) {
                                 try {
                                     distributeur.deleteCalcule(calcService);
                                 } catch (RemoteException ex) {
                                     throw new RuntimeException(ex);
                                 }
-                                System.out.println("Service effacé");
+                                System.out.println("Service supprimé");
                             }
-                        } else {
-                            System.out.println("Serveur pas disponible, veuillez patienter...");
+                        }else {
+                            System.out.println("Aucun service disponible pour le moment, veuillez patienter...");
                             try {
                                 Thread.sleep(5000);
                             } catch (InterruptedException e) {
@@ -87,18 +97,10 @@ public class Client {
                     }
                 }
             };
-            threads.add(t);
+
+            // Démarrage du thread
             t.start();
         }
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        long endTime = System.currentTimeMillis();
-        long duration = endTime - startTime;
-        System.out.println("Temps d'exécution : " + duration + " ms");
+
     }
 }

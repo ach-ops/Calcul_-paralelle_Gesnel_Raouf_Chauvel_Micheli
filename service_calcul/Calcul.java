@@ -10,15 +10,15 @@ public class Calcul implements CalculInterface
     /**
      * @param scene
      *      Image scene
-     * @param coordonnees
-     *      Coordonnées de l'image à calculer
+     * @param coor
+     *      coordinates of the image part to calculate
      */
     @Override
-    public Image calculer(Scene scene, Coordonnees coordonnees) throws RemoteException{
+    public Image calculer(Scene scene, Coordonnees coor) throws RemoteException{
         // Chronométrage du temps de calcul
         Instant debut = Instant.now();
-        System.out.println("Calcul de l'image :\n - Coordonnées : "+ coordonnees.x +","+ coordonnees.y +"\n - Taille "+ coordonnees.l + "x" + coordonnees.h);
-        Image image = scene.compute(coordonnees.x, coordonnees.y,coordonnees.l, coordonnees.h);
+        System.out.println("Calcul de l'image :\n - Coordonnées : "+ coor.x +","+ coor.y +"\n - Taille "+ coor.l + "x" + coor.h);
+        Image image = scene.compute(coor.x, coor.y,coor.l, coor.h);
         Instant fin = Instant.now();
 
         long duree = Duration.between(debut, fin).toMillis();

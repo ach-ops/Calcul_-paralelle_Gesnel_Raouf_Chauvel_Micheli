@@ -9,7 +9,7 @@ public interface CalculInterface extends Remote
 {
     /**
      * @param scene
-     * @param coordonnees
+     * @param coor
      */
-    public Image calculer(Scene scene, Coordonnees coordonnees) throws RemoteException, ServerNotActiveException;
+    public Image calculer(Scene scene, Coordonnees coor) throws RemoteException, ServerNotActiveException;
 }
