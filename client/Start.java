@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Start {
 
     public static final String COMMAND_HELP = "Erreur de commande : Nom incorrect ou nombre de paramètres incorrect";
-    public static final String COMMAND_INFO = "Veuillez saisir la commande suivante, en choisissant les valeurs des paramètres : 'run [largeur] [hauteur] [nombre de parties]'";
+    public static final String COMMAND_INFO = "Veuillez saisir la commande suivante, en choisissant les valeurs des paramètres : 'run [largeur] [hauteur] [nombre de parties]' ou 'sync [largeur] [hauteur] [nombre de parties]'";
 
     public static void main(String[] args) {
 
@@ -38,12 +38,6 @@ public class Start {
 
             String[] arguments = command.split(" "); // Découpage de la commande en arguments
 
-            for (String item : arguments){ // Boucle pour afficher les arguments de la commande
-                System.out.println(item); // Affichage de chaque argument
-            }
-
-            System.out.println("longueur :" + arguments.length);
-
             if (Objects.equals(arguments[0], "run") && arguments.length == 4) {
                 // Paramètres
                 int width = Integer.parseInt(arguments[1]); // Largeur de l'image
@@ -51,11 +45,17 @@ public class Start {
                 int nbPart = Integer.parseInt(arguments[3]); // Nombre de parties de l'image
                 String scenePath = "./simple.txt"; // Chemin de la scène
 
-                System.out.println("chemin");
-
                 // Démarrage du calcul de l'image
                 Client.calculerImage(dist, scenePath, nbPart, width, height);
-            }else {
+            } else if (Objects.equals(arguments[0], "sync") && arguments.length == 4) {
+                // Paramètres pour sync
+                int width = Integer.parseInt(arguments[1]);
+                int height = Integer.parseInt(arguments[2]);
+                int nbPart = Integer.parseInt(arguments[3]);
+                String scenePath = "./simple.txt";
+                // Démarrage du calcul de l'image avec synchronisation
+                Client.calculerImageSync(dist, scenePath, nbPart, width, height);
+            } else {
                 System.out.println(COMMAND_HELP);
             }
         }
